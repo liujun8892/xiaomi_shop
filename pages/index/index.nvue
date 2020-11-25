@@ -1,0 +1,348 @@
+<template>
+	<div>
+		<!-- 头部tabbar -->
+		<n-nav :tabbars="tabbars" :tabbarIndex="tabbarIndex" @changeTabbar="changeTabbar"></n-nav>
+
+		<!-- 内容滑块 -->
+		<slider class="flex-1 animated fadeIn faster" :index="tabbarIndex" @change="sliderChange" :infinite="false">
+			<list :show-scrollbar="false" v-for="(item,index) in newsItem" :key="index">
+				<template v-if="item.data.length >0">
+					<!-- 下拉刷新 -->
+					<refresh style="height: 80px;" class="w-100 text-center" :display="item.refreshShow" @refresh="refresh(item)"
+					 @pullingdown="pullingdown($event,item)">
+						<text class="font-md" style="text-align: center;line-height: 80px;">{{item.refreshText}}</text>
+					</refresh>
+					<cell v-for="(item1,index1) in item.data" :key="index1">
+						<!-- 轮播图 -->
+						<view class="" @click="goSearch" v-if="item1.type==='swiper'">
+							<n-swiper :swipers="item1.data" />
+						</view>
+						<!-- 栅格小窗口 -->
+						<view class="" @click="goSearch" v-if="item1.type==='indexnavs'">
+							<n-nav-grid :navGrid="item1.data" />
+						</view>
+						<!-- 分割线 -->
+						<n-divider />
+						<!-- 3图广告 -->
+						<view class="" @click="goSearch" v-if="item1.type==='threeAdv'">
+							<n-three-adv :threeAdv="item1.data" v-if="item1.type==='threeAdv'" />
+						</view>
+						<!-- 大图广告 -->
+						<n-big-adv :bigAdv="item1.data" v-if="item1.type==='oneAdv'" />
+						<!-- 商品列表 -->
+						<n-goods-list :goodsList="item1.data" v-if="item1.type==='list'" :customTitle="true">
+						</n-goods-list>
+					</cell>
+					<!-- 上拉加载 -->
+					<loading :display="item.loadShow" @loading="loadMore(item)" style="height: 120px;align-items: center;width: 750px;flex-direction: row; justify-content: center;">
+						<!-- <text class="font-md mr-2">{{loadText}}</text> -->
+						<loading-indicator></loading-indicator>
+					</loading>
+				</template>
+				<template v-else>
+					<cell class="j-center a-center pt-5" style="text-align: center;width:750px;">
+						<text class="font-md text-light-muted j-center a-center" style="text-align: center;">{{item.firstLoad ? '加载中...' : '暂无数据'}}</text>
+					</cell>
+				</template>
+			</list>
+		</slider>
+
+	</div>
+</template>
+
+<script>
+	// 引入顶部导航栏组件
+	import nNav from '@/components/index/nvue/n-nav.nvue'
+	// 导入轮播图nvue组件
+	import nSwiper from '@/components/index/nvue/n-swiper.nvue'
+	// 导入栅格小窗口组件
+	import nNavGrid from '@/components/index/nvue/n-nav-grid.nvue'
+	// 导入分割线组件
+	import nDivider from '@/components/common/nvue/n-divider.nvue'
+	// 导入3图组件
+	import nThreeAdv from '@/components/index/nvue/n-three-adv.nvue'
+	// 导入大图卡片
+	import nBigAdv from '@/components/common/nvue/n-big-adv.nvue'
+	// 导入商品列表组件
+	import nGoodsList from '@/components/common/nvue/n-goods-list.nvue'
+	// 请求apis
+	import $H from '@/common/lib/request.js';
+	// webview
+	const currentWebview = plus.webview.currentWebview()
+	const dom = weex.requireModule('dom')
+	export default {
+		components: {
+			nNav,
+			nSwiper,
+			nNavGrid,
+			nDivider,
+			nThreeAdv,
+			nBigAdv,
+			nGoodsList
+		},
+		data() {
+			return {
+				// 导航栏索引
+				tabbarIndex: 0,
+				refreshText: '下拉刷新',
+				refreshShow: 'hide',
+				loadText: '上拉加载',
+				loadShow: 'hide',
+				newsItem: [],
+				// 轮播图
+				swipers: [{
+					src: '/static/images/demo/demo4.jpg'
+				}, {
+					src: '/static/images/demo/demo4.jpg'
+				}, {
+					src: '/static/images/demo/demo4.jpg'
+				}],
+				// 导航栏数据
+				tabbars: [],
+				// 栅格小窗口
+				navGrid: [{
+						src: '/static/images/indexnav/1.png',
+						text: '新品分类'
+					},
+					{
+						src: '/static/images/indexnav/2.gif',
+						text: '小米众筹'
+					},
+					{
+						src: '/static/images/indexnav/3.gif',
+						text: '以旧换新'
+					},
+					{
+						src: '/static/images/indexnav/4.gif',
+						text: '1分拼团'
+					},
+					{
+						src: '/static/images/indexnav/5.gif',
+						text: '超值特卖'
+					},
+					{
+						src: '/static/images/indexnav/6.gif',
+						text: '小米秒杀'
+					},
+					{
+						src: '/static/images/indexnav/7.gif',
+						text: '真心想要'
+					},
+					{
+						src: '/static/images/indexnav/8.gif',
+						text: '电视热卖'
+					},
+					{
+						src: '/static/images/indexnav/9.gif',
+						text: '家电热卖'
+					},
+					{
+						src: '/static/images/indexnav/10.gif',
+						text: '米粉卡'
+					}
+				],
+				// 3图广告
+				threeAdv: {
+					big: {
+						src: '/static/images/demo/demo1.jpg'
+					},
+					smalltop: {
+						src: '/static/images/demo/demo2.jpg'
+					},
+					smallbottom: {
+						src: '/static/images/demo/demo2.jpg'
+					}
+				},
+				// 商品列表
+				goodsList: [{
+					cover: '/static/images/demo/list/1.jpg',
+					title: '米家空调',
+					desc: '1.5匹支持变频',
+					pprice: 2199,
+					oprice: 2699
+				}, {
+					cover: '/static/images/demo/list/2.jpg',
+					title: '米家空调',
+					desc: '1.5匹支持变频',
+					pprice: 2199,
+					oprice: 2699
+				}, {
+					cover: '/static/images/demo/list/3.jpg',
+					title: '米家空调',
+					desc: '1.5匹支持变频',
+					pprice: 2199,
+					oprice: 2699
+				}, {
+					cover: '/static/images/demo/list/4.jpg',
+					title: '米家空调',
+					desc: '1.5匹支持变频',
+					pprice: 2199,
+					oprice: 2699
+				}, {
+					cover: '/static/images/demo/list/5.jpg',
+					title: '米家空调',
+					desc: '1.5匹支持变频',
+					pprice: 2199,
+					oprice: 2699
+				}, {
+					cover: '/static/images/demo/list/6.jpg',
+					title: '米家空调',
+					desc: '1.5匹支持变频',
+					pprice: 2199,
+					oprice: 2699
+				}],
+				// 大图
+				bigAdv: {
+					title: '每日精选',
+					cover: '/static/images/demo/demo4.jpg',
+					timer: null
+				}
+			}
+		},
+		methods: {
+			// tabbar切换
+			changeTabbar(index) {
+				if (index === this.tabbarIndex) return
+				this.tabbarIndex = index
+			},
+			// 下面的滚动切换
+			sliderChange(e) {
+				this.tabbarIndex = e.index
+				// 加载数据
+				if (this.newsItem[this.tabbarIndex].firstLoad) this.getSliderData()
+			},
+			// 执行刷新
+			refresh(item) {
+				console.log('执行刷新了........')
+				item.refreshShow = 'show'
+				item.refreshText = '刷新中...'
+				this.getSliderData(() => {
+					item.refreshShow = 'hide'
+					item.refreshText = '刷新成功'
+					uni.showToast({
+						title: '刷新成功',
+						icon: 'none'
+					})
+					this.timer = setTimeout(() => {
+						item.refreshText = '下拉刷新'
+						clearTimeout(this.timer)
+					}, 500)
+				}, true)
+
+			},
+			// 去搜索页
+			goSearch() {
+				uni.navigateTo({
+					url: '../search/search'
+				});
+			},
+			// 下拉
+			pullingdown(e, item) {
+				if (e.pullingDistance > e.viewHeight) {
+					item.refreshText = '释放刷新'
+				} else {
+					item.refreshText = '下拉刷新'
+				}
+			},
+			// 加载更多数据 / 刷新
+			loadMore(item) {
+				// item.loadShow = 'hide'
+				if (!item.haveMore) {
+					return uni.showToast({
+						title: '没有更多了',
+						icon: 'none'
+					})
+				}
+
+				item.loadShow = 'show'
+				this.getSliderData(() => {
+					item.loadShow = 'hide'
+					uni.showToast({
+						title: '加载成功',
+						icon: 'none'
+					})
+				})
+
+			},
+			__init() {
+				$H.get('/index_category/data')
+					.then(res => {
+						// 初始化tabbars
+						this.tabbars = res.category
+						console.log(this.tabbars, '导航栏数据....')
+						// 初始化页面其他数据
+						this.newsItem = this.setNewsItem(res)
+						console.log(this.newsItem, '其他数据....')
+					})
+			},
+			// 定义首页导航栏下滑块的数据结构, 填充首页首屏数据
+			setNewsItem(dt) {
+				let arr = []
+				let length = this.tabbars.length
+				let item = {}
+				for (let i = 0; i < length; i++) {
+					item = {
+						data: [],
+						loadShow: 'hide',
+						haveMore: true,
+						refreshText: '下拉刷新',
+						refreshShow: 'hide',
+						firstLoad: true
+					}
+					if (this.tabbars[i].template === 'index') {
+						item.data = dt.data
+						item.firstLoad = false
+					}
+					arr.push(item)
+				}
+				console.log(arr, '1111')
+				return arr
+			},
+			// 滑块滑动加载数据
+			getSliderData(callback = false, refresh = false) {
+				let index = this.tabbarIndex
+				let tabbarId = this.tabbars[index].id
+				let sliderPage = !refresh ? Math.ceil(this.newsItem[index].data.length / 5) + 1 : 1
+				$H.get(`/index_category/${tabbarId}/data/${sliderPage}`).then(dt => {
+					let newData = dt
+					// 当前滑块赋值 / 加载更多 或 下拉刷新
+					this.newsItem[index].data = !refresh ? [...this.newsItem[index].data, ...newData] : [...newData],
+						// 是否是第一次加载数据
+						this.newsItem[index].firstLoad = false
+					// 有没有更多数据
+					this.newsItem[index].haveMore = newData.length === 5
+					console.log(this.newsItem, '3333')
+					console.log(this.newsItem[index].haveMore, 4444)
+					// 执行上拉加载的回调
+					if (typeof callback === 'function') callback()
+				})
+			},
+		},
+		onNavigationBarSearchInputClicked() {
+			uni.navigateTo({
+				url: '../search/search'
+			})
+		},
+		onLoad() {
+
+		},
+		created() {
+			this.__init()
+		}
+	}
+</script>
+
+<style src="@/common/zcm-main-nvue.css"></style>
+<style src="@/common/common.css"></style>
+<style lang="less">
+	.grid_item {
+		width: (750px - 40) / 5;
+		height: (300px - 20) / 2;
+	}
+
+	.nav_active_border {
+		border-bottom-width: 4px;
+		border-bottom-color: #FD6801;
+		border-style: solid;
+	}
+</style>

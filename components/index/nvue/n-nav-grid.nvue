@@ -1,0 +1,28 @@
+<template>
+	<div>
+		<!-- 栅格小窗口 -->
+		<div class="row px-2 py-1 w-100 mb-2" >
+			<div v-for="(item,index) in navGrid" :key="index" class="grid_item flex-wrap j-center a-center"
+			>
+				<image :src="item.src" style="width: 60px;height: 60px;margin-bottom: 14px;"></image>
+				<text style="font-size: 22px;">{{item.text}}</text>
+			</div>
+		</div>
+	</div>
+</template>
+
+<script>
+	export default {
+		props:{
+			navGrid:  Array | Object
+		}
+	}
+</script>
+
+<style src="@/common/zcm-main-nvue.css"></style>
+<style scoped lang="less">
+	.grid_item {
+		width: (750px - 40) / 5;
+		height: (300px - 20) / 2;
+	}
+</style>

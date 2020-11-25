@@ -1,0 +1,58 @@
+/* 页面的样式 */
+/* #ifndef APP-PLUS-NVUE */
+page {
+	height: 100%;
+	font-size: 28rpx;
+	line-height: 1.8;
+	background-color: #FFFFFF;
+}
+
+/* 图片宽度 */
+image {
+	width: 100%;
+}
+
+/* #endif */
+
+
+/* h5tabbar遮盖问题 */
+/* #ifdef H5 */
+.content_H {
+	padding-bottom: var(--window-bottom);
+}
+
+/* #endif */
+
+/* 主色调 */
+.main_bg_color {
+	background-color: #FD6801;
+}
+
+/* 点击主色调 */
+.main_bg_hover_color {
+	background-color: rgba(253, 104, 1, 0.85);
+}
+
+/* 文字主色调 */
+.main_text_color {
+	color: #FD6801;
+}
+
+/* 边框颜色 */
+.main_border_color {
+	border-color: #F1F1F1;
+}
+
+/* 文字显示两行, 溢出隐藏 */
+.limit-line-2 {
+	word-break: break-all;
+	text-overflow: ellipsis;
+	display: -webkit-box;
+	/** 对象作为伸缩盒子模型显示 **/
+	-webkit-box-orient: vertical;
+	/** 设置或检索伸缩盒对象的子元素的排列方式 **/
+	-webkit-line-clamp: 2;
+	/** 显示的行数 **/
+	overflow: hidden;
+	/** 隐藏超出的内容 **/
+}

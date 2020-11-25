@@ -1,0 +1,36 @@
+<template>
+	<div>
+		<!-- 3图广告 -->
+		<div class="w-100 row" style="height: 530px;" v-if="threeAdv">
+			<div class="flex-1" style="height: 530px;">
+				<image class="flex-1" :src="threeAdv[0].src" ></image>
+			</div>
+			<div style="width: 4px;height: 530px;background-color: #FFFFFF;"></div>
+			<div class="flex-1" style="height: 530px;background-color: pink;">
+				<div class="flex-1">
+					<image class="flex-1" :src="threeAdv[1].src" ></image>
+				</div>
+				<div style="height: 4px;background-color: #FFFFFF;"></div>
+				<div class="flex-1">
+					<image class="flex-1" :src="threeAdv[2].src" ></image>
+				</div>
+			</div>
+		</div>
+	</div>
+</template>
+
+<script>
+	export default {
+		props:{
+			threeAdv: {
+				type: Object,
+				default: {}
+			}
+		}
+	}
+</script>
+
+<style src="@/common/zcm-main-nvue.css"></style>
+<style >
+
+</style>

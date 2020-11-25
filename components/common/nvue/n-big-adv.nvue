@@ -1,0 +1,37 @@
+<template>
+	<div>
+		<!-- 大图广告 -->
+		<div class="w-100" style="height: 380px;" @click="openDetail">
+			<div class="w-100  pl-2 j-center" style="height: 75px;line-height: 75px;">
+				<text class="font-md font-weight">{{bigAdv.title}}</text>
+			</div>
+			<div class="flex-1">
+				<image class="flex-1" :src="bigAdv.cover"></image>
+			</div>
+		</div>
+	</div>
+	
+</template>
+
+<script>
+	export default {
+		props: {
+			bigAdv: {
+				type: Object,
+				default: {}
+			}
+		},
+		methods: {
+			// 去详情页
+			openDetail() {
+				uni.navigateTo({
+					url: '/pages/detail/detail?id='+ 25
+				});
+			}
+		}
+	}
+</script>
+<style src="@/common/zcm-main-nvue.css"></style>
+<style >
+	
+</style>

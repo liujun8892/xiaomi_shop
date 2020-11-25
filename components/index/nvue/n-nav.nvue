@@ -1,0 +1,69 @@
+<template>
+	<div>
+		<!-- 首页导航栏 -->
+		<scroller style="width: 750px;height: 75px;" class="row" scroll-direction="horizontal" :show-scrollbar="false">
+			<div  style="width: 125px;height: 75px;" v-for="(item,index) in tabbars" :key="index" :class="{'nav_active_border': tabbarIndex === index}" @click="changeTabbar(index)"  :ref="'tab' + index">
+				<text class="font-md" style="text-align: center; line-height: 75px;" :class="{'main_text_color': tabbarIndex === index}">{{item.name}}</text>
+			</div>
+		</scroller>
+	</div>
+</template>
+
+<script>
+	// 引入weex的dom
+	const dom = weex.requireModule('dom')
+	export default {
+		watch:{
+			// 观察当前导航栏索引
+			tabbarIndex(newValue,oldValue) {
+				this.handleTabScrollTo(newValue)
+			}
+		},
+		props: {
+			// 导航栏数据
+			tabbars: {
+				type: Array,
+				default: []
+			},
+			// 当前导航栏索引
+			tabbarIndex: {
+				type: Number,
+				default: 0
+			}
+		},
+		methods: {
+			// 导航栏切换
+			changeTabbar(index) {
+				this.$emit('changeTabbar',index)
+			},
+			// tabbar联动跟随效果
+			handleTabScrollTo(index) {
+				let currentTabEle = this.$refs[`tab${index}`][0]
+				console.log(currentTabEle);
+				 dom.getComponentRect(currentTabEle,res => {
+					 console.log(res);
+					 let right = res.size.right
+					 // 每个元素宽125rpx 6个占满手机屏幕的宽度750rpx。
+					 // 当超过750rpx时,导航栏是当前元素向前找4个做为第一个元素
+					 if(right > 750) {
+						 dom.scrollToElement(this.$refs[`tab${index-4}`][0])
+					 }else if(right < 50) {
+						 // 如果小于50rpx,让自己成为导航栏的第一个元素则行
+						 dom.scrollToElement(currentTabEle)
+					 }
+				 })
+			}
+		}
+	}
+</script>
+
+
+<style src="@/common/zcm-main-nvue.css"></style>
+<style src="@/common/common.css"></style>
+<style scoped>
+	.nav_active_border {
+		border-bottom-width: 4px;
+		border-bottom-color: #FD6801;
+		border-style: solid;
+	}
+</style>

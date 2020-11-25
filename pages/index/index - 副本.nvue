@@ -1,0 +1,110 @@
+<template>
+	<div>
+		<list>
+			<!-- 下拉刷新 -->
+			<refresh style="text-align: center;height: 80px;" :display="refreshShow"
+			@refresh="refresh" @pullingdown="pullingdown">
+				<text>{{refreshText}}</text>
+			</refresh>
+			<!-- 头部吸附 -->
+			<header style="height: 100px;background-color: #0056B3;" @click="goCeShiPage">
+				<text>{{topHeaderText}}</text>
+			</header>
+			<cell v-for="(item,index) in lists" :key="index" @click="sendMessage(item)">
+				<div style="width: 100%;height: 300px;background-color: pink;margin: 50px;"><text>{{item}}</text></div>
+			</cell>
+			<cell style="flex-direction: row;flex-wrap: wrap;">
+				<div style="height: 100px;background-color: skyblue;width: 375px;justify-content: center;align-items: center;"><text>1</text></div>
+				<div style="height: 100px;background-color: skyblue;width: 375px;justify-content: center;align-items: center;"><text>2</text></div>
+				<div style="height: 100px;background-color: skyblue;width: 375px;justify-content: center;align-items: center;"><text>3</text></div>
+				<div style="height: 100px;background-color: skyblue;width: 375px;justify-content: center;align-items: center;"><text class="main_text_color">4</text></div>
+			</cell>
+			<!-- 上拉加载 -->
+			<loading :display="loadShow" @loading="loadMore" style="height: 200px;align-items: center;width: 750px;flex-direction: row;">
+				 <text style="margin-bottom: 20;">{{loadText}}</text>
+				 <loading-indicator></loading-indicator>
+			</loading>
+		</list>
+	</div>
+</template>
+
+<script>
+	export default {
+		data() {
+			return {
+				lists: ['A','B','C','D','E'],
+				refreshText: '下拉刷新',
+				refreshShow: 'hide',
+				loadText: '上拉加载',
+				loadShow: 'hide',
+				topHeaderText: '头部....'
+			}
+		},
+		methods:{
+			// 执行刷新
+			refresh() {
+				console.log('执行刷新了........');
+				this.refreshShow = 'show'
+				this.refreshText = '刷新中...'
+				setTimeout(()=>{
+					this.refreshShow= 'hide'
+					this.refreshText = '下拉刷新'
+				},1200)
+			},
+			// 下拉
+			pullingdown(e) {
+				console.log(e,'被下拉了....');
+				if(e.pullingDistance > e.viewHeight) {
+					this.refreshText = '释放刷新'
+				}else {
+					this.refreshText = '下拉刷新'
+				}	
+			},
+			// 上拉加载更多
+			loadMore() {
+				this.loadShow = 'show'
+				this.loadText = '加载中....'
+				setTimeout(()=>{
+					this.lists = [...this.lists,...this.lists]
+					this.loadShow = 'hide'
+					this.loadText = '上拉加载'
+				},1200)
+			},
+			// nvue和vue之间的通讯
+			sendMessage(e) {
+				uni.$emit('changeData',e)
+			},
+			// 去测试页面
+			goCeShiPage() {
+				console.log('goceshi...');
+				uni.navigateTo({
+					url: '../ceshi/ceshi',
+					fail: (err) => {
+						console.log(err);
+					}
+				});
+			}
+		},
+		created() {
+			// 1.通过globalData的方式非实时的传递数据
+			getApp().globalData.message = 'indexMessage'
+			uni.$on('changeIndexData',e=>{
+				console.log(e,'来消息了...');
+				this.topHeaderText = e
+			})
+			uni.onNavigationBarButtonTap(e=>{
+				console.log(e,'导航栏被点击了...');
+			})
+			uni.onNavigationBarSearchInputClicked(e => {
+				console.log(e,'搜索框被点击了...');
+			})
+			uni.setStorageSync('msg2','hello...')
+			
+		}
+	}
+</script>
+
+<style src="@/common/common.css"></style>
+<style>
+
+</style>

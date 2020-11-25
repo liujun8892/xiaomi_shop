@@ -1,0 +1,50 @@
+<template>
+	<div>
+		<!-- 轮播图 -->
+		<slider class="slider" interval="4000" auto-play="true">
+			<div class="slider_item" v-for="(item,index) in swipers" :key="index">
+				<image class="image" :src="item.src" resize="cover"></image>
+			</div>
+			<indicator class="indicator"></indicator>
+		</slider>
+	</div>
+</template>
+
+<script>
+	export default {
+		props:{
+			swipers:  Array | Object
+		}
+	}
+</script>
+
+<style scoped>
+	.slider {
+		width: 750px;
+		height: 300px;
+		transition-duration: 0.8s;
+	}
+
+
+	.slider_item {
+		width: 750px;
+		height: 300px;
+	}
+
+	.image {
+		width: 750px;
+		height: 300px;
+	}
+
+	.indicator {
+		position: absolute;
+		left: 275px;
+		bottom: 0;
+		width: 200px;
+		height: 50px;
+		// background-color: rgba(0,0,0,0);
+		item-color: rgba(0, 0, 0, 0.3);
+		item-selected-color: rgba(0, 0, 0, 0.5);
+		item-size: 12px;
+	}
+</style>

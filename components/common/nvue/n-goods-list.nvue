@@ -1,0 +1,43 @@
+<template>
+	<div>
+		<!-- 商品列表 -->
+		<div class="w-100 row flex-wrap">
+			<div class="col-6" style="padding: 2px" v-for="(item,index) in goodsList" :key="index" @click="openDetail(item)">
+				<image :src="item.cover"  style="width: 370px; height: 370px;"></image>
+					<text class="font-md font-weight pl-2 py-2" style="lines: 1;">{{!customTitle ? item.title : '小米商品'}}</text>
+				<text class="pl-2 font-sm text-light-muted" style="lines: 1;padding-bottom: 15px;">{{item.desc}}</text>
+				<div class="row pl-2">
+					<text class="font-sm main_text_color" style="align-self:flex-start;">￥</text>
+					<text class="font main_text_color" style="padding-right: 15px;">{{item.pprice}}</text>
+					<text class="font-sm text-light-muted a-self-end line-through" style="align-self:flex-end;">￥{{item.oprice}}</text>
+				</div>
+			</div>
+		</div>
+	</div>
+</template>
+
+<script>
+	export default {
+		props: {
+			goodsList: Array,
+			customTitle: {
+				type: Boolean,
+				default: false
+			}
+		},
+		methods:{
+			// 去详情页
+			openDetail(item) {
+				uni.navigateTo({
+					url: '/pages/detail/detail?id=' + item.id
+				});
+			}
+		}
+	}
+</script>
+
+<style src="@/common/common.css"></style>
+<style src="@/common/zcm-main-nvue.css"></style>
+<style >
+	
+</style>
